@@ -1,0 +1,50 @@
+SELECT * FROM ciudadanos;
+SELECT * FROM Ciudadanas_Mujeres_vw;
+
+CREATE OR REPLACE VIEW Ciudadanas_Mujeres_vw
+AS
+(SELECT * 
+FROM ciudadanos
+WHERE GENERO_PERSONA LIKE 'fem%'
+ORDER BY NACIMIENTO_PERSONA DESC
+);
+
+SELECT * FROM TRANSPORTE;
+SELECT * FROM Viajantes_de_Colectivo_vw;
+
+CREATE OR REPLACE VIEW Viajantes_de_Colectivo_vw
+AS
+(SELECT * 
+FROM transporte
+WHERE TRANSPORTE_PUBLICO = 'Colectivo'
+ORDER BY ID_TRANSPORTE
+);
+
+SELECT * FROM resultados;
+SELECT * FROM test_covid_positivo;
+SELECT * FROM Contactos_c_estrecho_positivo_vw;
+
+CREATE OR REPLACE VIEW Contactos_c_estrecho_positivo_vw
+AS 
+SELECT TC.TEST_COVID as Casos_positivos 
+FROM TEST_COVID_POSITIVO TCP
+INNER JOIN RESULTADOS TC ON TCP.DNI_PERSONA_TESTEADA=TC.DNI_PERSONA_TESTEADA 
+WHERE TEST_COVID ='Positivo';
+
+SELECT * FROM vacunas_1_dosis;
+SELECT * FROM Personas_Testeadas_mayores;
+
+CREATE VIEW Personas_Testeadas_mayores
+AS
+select DNI_PERSONA_TESTEADA
+from vacunas_1_dosis
+where DNI_PERSONA_TESTEADA < 10000000;
+
+SELECT * FROM vacunas_3_dosis;
+SELECT * FROM Personas_con_3dosis_aplicada_en_Belgrano_vw;
+
+CREATE OR REPLACE VIEW Personas_con_3dosis_aplicada_en_Belgrano_vw
+AS
+select DONDE_SE_APLICO
+from vacunas_3_dosis
+where DONDE_SE_APLICO = "BELGRANO";
