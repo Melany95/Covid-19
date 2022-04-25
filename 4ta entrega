@@ -1,0 +1,35 @@
+USE COVID;
+
+-- Funcion que sirve para buscar por DNI cual fue la primer dosis que se dio cada persona --
+
+SELECT * FROM covid.vacunas_1_dosis;
+select covid.marcas_de_1_vacuna_en_personas(8938762);
+
+DELIMITER $$
+
+CREATE FUNCTION `marcas_de_1_vacuna_en_personas` (DNI_PERSONA INT)
+RETURNS VARCHAR(100) 
+READS SQL DATA BEGIN 
+DECLARE vacunas_1_dosis_MARCA_PERSONA_VACUNADA VARCHAR(100);
+SET vacunas_1_dosis_MARCA_PERSONA_VACUNADA = (SELECT MARCA_PERSONA_VACUNADA FROM vacunas_1_dosis WHERE DNI_PERSONA_TESTEADA = DNI_PERSONA);
+RETURN vacunas_1_dosis_MARCA_PERSONA_VACUNADA;
+END $$
+
+DELIMITER ;
+
+-- Funcion que sirve para buscar por DNI que persona dio Covid positivo o negativo --
+
+SELECT * FROM covid.resultados;
+select covid.personas_testeadas(8938849);
+
+DELIMITER $$
+
+CREATE FUNCTION `personas_testeadas` (PERSONA_TESTEADA INT)
+RETURNS VARCHAR(60) 
+READS SQL DATA BEGIN 
+DECLARE resultados_TEST_COVID VARCHAR(60);
+SET resultados_TEST_COVID = (SELECT TEST_COVID FROM resultados WHERE DNI_PERSONA_TESTEADA = PERSONA_TESTEADA);
+RETURN resultados_TEST_COVID;
+END $$
+
+DELIMITER ;
