@@ -1,0 +1,34 @@
+
+-- Sotored marca de las vacunas aplicadas en primera dosis
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `marcas_de_primera_vacuna_en_personas`()
+BEGIN
+
+SELECT MARCA_PERSONA_VACUNADA FROM vacunas_1_dosis
+ORDER BY MARCA_PERSONA_VACUNADA DESC;
+
+END
+
+call covid.marcas_de_primera_vacuna_en_personas();
+
+-- Sotored personas que dieron COVID positivo
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `personas_covid_positivo`()
+BEGIN
+SELECT DNI_PERSONA_TESTEADA AS DNI_PERSONA_POSITIVO FROM TEST_COVID_POSITIVO
+ORDER BY DNI_PERSONA_TESTEADA DESC;
+END
+
+call covid.personas_covid_positivo();
+
+-- Consulta por DNI, quien dio positivo o negativo en el test
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `Resultado_Test`(Persona int)
+BEGIN
+DECLARE resultados_TEST_COVID VARCHAR(60);
+SET resultados_TEST_COVID = (SELECT test_covid FROM resultados WHERE DNI_PERSONA_TESTEADA = PERSONA);
+SELECT resultados_TEST_COVID;
+END
+
+-- Ejemplo con DNI 8938762
+call covid.Resultado_Test(8938762);
