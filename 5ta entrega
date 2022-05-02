@@ -1,0 +1,104 @@
+-- Creo la tabla de Auditoria para ver las nuevas modificaciones que realice en la tabla Vacunas 2da dosis
+
+CREATE TABLE Auditoria_Vacunas_2_dosis(
+ID_VACUNA_2_DOSIS INT PRIMARY KEY,
+DNI_PERSONA_TESTADA INT,
+MARCA_PERSONA_VACUNADA_MODIF varchar(100),
+DOSIS_N1_PERSONA_VACUNADA_MODIF INT,
+DONDE_SE_APLICO_MODIF varchar(100)) ;
+
+-- Creo el Trigger "Vacunas_2dosis_Trigger" 
+-- Le indico que quiero que almacene las actualizaciones de la tabla "Vacunas_2dosis_Trigger" en la tabla "Auditoria_Vacunas_2_dosis"
+-- Adicional, le indico que me diga quien realizo las modificaciones y a que hora
+
+-- Registra lugar de aplicacion
+DROP TRIGGER IF EXISTS Vacunas_2dosis_Trigger;
+CREATE TRIGGER Vacunas_2dosis_Trigger
+AFTER UPDATE ON Vacunas_2_dosis
+FOR EACH ROW
+INSERT INTO  Auditoria_Vacunas_2_dosis VALUES (new.id_vacuna_2_dosis, new.dni_persona_testeada, new.marca_persona_vacunada, new.dosis_n1_persona_vacunada, new.donde_se_aplico );
+SELECT USER();
+SELECT CURTIME();
+
+-- Realizo las modificaciones sobre la linea que posee el ID_VACUNA 200
+
+ UPDATE VACUNAS_2_DOSIS set    
+MARCA_PERSONA_VACUNADA ='Moderna'
+WHERE ID_VACUNA_2_DOSIS ='200';
+ 
+-- Consulto la tabla AUDITORIA_VACUNAS_2_DOSIS
+SELECT * FROM AUDITORIA_VACUNAS_2_DOSIS;
+-- Consulto la tabla VACUNAS_2_DOSIS
+SELECT * FROM VACUNAS_2_DOSIS;
+
+----
+
+-- Creo la tabla de Auditoria para ver las modificaciones que realice en la tabla Ciudadanos
+
+CREATE TABLE Auditoria_Ciudadanos(
+DNI_PERSONA_TESTEADA_MODIF INT PRIMARY KEY,
+VIEJO_NOMBRE_PERSONA TEXT,
+GENERO_PERSONA_MODIF TEXT,
+NACIMIENTO_PERSONA_MODIF DATE,
+DOMICILIO_PERSONA_MODIF varchar(100)) ;
+
+-- Creo el Trigger "Ciudadanos_Trigger" 
+-- Le indico que quiero que almacene las modificaciones de la tabla "Ciudadanos" en la tabla "Auditoria_Ciudadanos"
+-- Adicional, le indico que me diga quien realizo las modificaciones y a que hora
+
+DROP TRIGGER IF EXISTS CIUDADANOS_TRIGGER;
+CREATE TRIGGER CIUDADANOS_TRIGGER 
+BEFORE UPDATE ON CIUDADANOS
+FOR EACH ROW
+INSERT INTO Auditoria_Ciudadanos values(old.dni_persona_testeada, old.nombre_persona, old.genero_persona, old.nacimiento_persona, old.domicilio_persona);
+SELECT USER();
+SELECT CURTIME();
+
+-- Realizo las modificaciones sobre la linea que posee DNI 44678275
+-- La persona tiene el nombre "Pardes Rosario" y se le cambia por "Pardes Rosario Ana"
+
+ UPDATE CIUDADANOS set    
+nombre_persona='Pardes Rosario Ana',
+domicilio_persona='Alem 88 1°C'
+WHERE DNI_PERSONA_TESTEADA ='44678275';
+ 
+-- Consulto la tabla AUDITORIA_CIUDADANOS
+SELECT * FROM AUDITORIA_CIUDADANOS;
+-- Consulto la tabla CIUDADANOS
+SELECT * FROM CIUDADANOS;
+
+----
+
+-- Sotored marca de las vacunas aplicadas en primera dosis
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `marcas_de_primera_vacuna_en_personas`()
+BEGIN
+
+SELECT MARCA_PERSONA_VACUNADA FROM vacunas_1_dosis
+ORDER BY MARCA_PERSONA_VACUNADA DESC;
+
+END
+
+call covid.marcas_de_primera_vacuna_en_personas();
+
+-- Sotored personas que dieron COVID positivo
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `personas_covid_positivo`()
+BEGIN
+SELECT DNI_PERSONA_TESTEADA AS DNI_PERSONA_POSITIVO FROM TEST_COVID_POSITIVO
+ORDER BY DNI_PERSONA_TESTEADA DESC;
+END
+
+call covid.personas_covid_positivo();
+
+-- Consulta por DNI, quien dio positivo o negativo en el test
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `Resultado_Test`(Persona int)
+BEGIN
+DECLARE resultados_TEST_COVID VARCHAR(60);
+SET resultados_TEST_COVID = (SELECT test_covid FROM resultados WHERE DNI_PERSONA_TESTEADA = PERSONA);
+SELECT resultados_TEST_COVID;
+END
+
+-- Ejemplo con DNI 8938762
+call covid.Resultado_Test(8938762);
