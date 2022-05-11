@@ -1,0 +1,50 @@
+-- Voy a eliminar de la tabla "Resultados" ID_Resultados n°1
+-- Para deshacer dicha operación, utilizo el Rollbalck
+
+START TRANSACTION;
+DELETE FROM `covid`.`resultados` 
+WHERE (`ID_RESULTADOS` = '1');
+-- ROLLBACK;
+-- COMMIT;
+
+-- Puedo consultar la tabla de Resultados para ver las modificaciones
+SELECT * FROM covid.resultados;
+
+-- En este caso, este dato no deberia ser eliminado, para volver a incorporarlo puedo hacerlo de este modo
+START TRANSACTION;
+INSERT INTO RESULTADOS (ID_RESULTADOS, DNI_PERSONA_TESTEADA, TEST_COVID) 
+VALUES ('1', '8938762', 'Positivo');
+-- COMMIT;
+
+--
+
+-- Voy a insertar en la tabla de Ciudadanos, 8 registros nuevos en 2 lotes (con 2 savepoint)
+-- Voy a eliminar el 1er savepoint
+
+START TRANSACTION;
+INSERT INTO CIUDADANOS (DNI_PERSONA_TESTEADA, NOMBRE_PERSONA, GENERO_PERSONA, NACIMIENTO_PERSONA, DOMICILIO_PERSONA) 
+VALUES (8871132, 'Daniela Legrand', 'femenino', '1928-03-22', 'Velasco 650');
+INSERT INTO CIUDADANOS (DNI_PERSONA_TESTEADA, NOMBRE_PERSONA, GENERO_PERSONA, NACIMIENTO_PERSONA, DOMICILIO_PERSONA) 
+VALUES (60717732, 'Marcelo Gomez', 'masculino', '2020-05-12', 'Cramer 60');
+INSERT INTO CIUDADANOS (DNI_PERSONA_TESTEADA, NOMBRE_PERSONA, GENERO_PERSONA, NACIMIENTO_PERSONA, DOMICILIO_PERSONA) 
+VALUES (43715631, 'Mercedez Pillo', 'femenino', '1994-05-18', 'Lavalle 1560');
+INSERT INTO CIUDADANOS (DNI_PERSONA_TESTEADA, NOMBRE_PERSONA, GENERO_PERSONA, NACIMIENTO_PERSONA, DOMICILIO_PERSONA) 
+VALUES (44514634, 'Julia Garcia', 'femenino', '1993-06-1', 'Bufano 15');
+savepoint LOTE_CIUDADANOS_1;
+
+-- Para eliminar el savepoint del Lote_Ciudadanos_1 tendria que hacer el RELEASE de la siguiente forma
+-- RELEASE savepoint LOTE_CIUDADANOS_1;
+
+START TRANSACTION;
+INSERT INTO CIUDADANOS (DNI_PERSONA_TESTEADA, NOMBRE_PERSONA, GENERO_PERSONA, NACIMIENTO_PERSONA, DOMICILIO_PERSONA) 
+VALUES (28554657, 'Jorge Flores', 'masculino', '1977-12-31', 'Jonte 900');
+INSERT INTO CIUDADANOS (DNI_PERSONA_TESTEADA, NOMBRE_PERSONA, GENERO_PERSONA, NACIMIENTO_PERSONA, DOMICILIO_PERSONA) 
+VALUES (38676478, 'Giuliano Avalos', 'masculino', '1995-10-30', 'Av. Triunvirato 3901');
+INSERT INTO CIUDADANOS (DNI_PERSONA_TESTEADA, NOMBRE_PERSONA, GENERO_PERSONA, NACIMIENTO_PERSONA, DOMICILIO_PERSONA) 
+VALUES (9466748, 'Thomas Gloss', 'masculino', '1958-04-24', 'Av. Gaona 304');
+INSERT INTO CIUDADANOS (DNI_PERSONA_TESTEADA, NOMBRE_PERSONA, GENERO_PERSONA, NACIMIENTO_PERSONA, DOMICILIO_PERSONA) 
+VALUES (10564494, 'Sebastian Martin', 'masculino', '1969-03-02', 'Julian Alvarez 433');
+savepoint LOTE_CIUDADANOS_2;
+
+-- Visualizo la tabla de "Ciudadanos" que efectivamente se hayan incorporado los registros nuevos
+SELECT * FROM CIUDADANOS;
